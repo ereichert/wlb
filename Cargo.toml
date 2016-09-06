@@ -1,0 +1,7 @@
+[package]
+name = "wlb"
+version = "0.1.0"
+authors = ["ereichert"]
+
+[dependencies]
+iron = "0.4.0"
