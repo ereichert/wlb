@@ -5,3 +5,5 @@ authors = ["ereichert"]
 
 [dependencies]
 iron = "0.4.0"
+handlebars-iron = "0.18.0"
+env_logger = "0.3.4"
