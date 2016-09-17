@@ -4,9 +4,11 @@ extern crate router;
 
 use iron::prelude::{Chain, Iron, Request, Response};
 use iron::{IronResult, status, Set};
-extern crate handlebars_iron;
-use handlebars_iron as hbs;
-use handlebars_iron::{HandlebarsEngine};
+extern crate handlebars_iron as hbs;
+use hbs::{HandlebarsEngine};
+#[cfg(feature = "watch")]
+use hbs::Watchable;
+use std::sync::Arc;
 use std::error::Error;
 
 fn main() {
@@ -17,9 +19,11 @@ fn main() {
     if let Err(r) = hbse.reload() {
         panic!("{:?}", r.description());
     }
+    let hbse_ref = Arc::new(hbse);
+    hbse_ref.watch("./src/views/");
 
     let mut home_chain = Chain::new(home_handler);
-    home_chain.link_after(hbse);
+    home_chain.link_after(hbse_ref);
 
     let mut router = router::Router::new();
     router.get("/", home_chain, "home");
