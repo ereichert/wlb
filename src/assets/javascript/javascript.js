@@ -1,1 +1,1 @@
-alert("Fuck off douche.!!")
+alert("Get balanced.")
