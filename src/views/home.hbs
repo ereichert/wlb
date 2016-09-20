@@ -16,7 +16,29 @@
                 <input type="submit" value="Save">
             </form>
         </div>
-
+        <div id="task_history_table">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="date_time_cols">Date</th>
+                        <th class="date_time_cols">Start</th>
+                        <th class="date_time_cols">Stop</th>
+                        <th class="project_col">Project</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each task_records}}
+                        <tr>
+                            <td>{{this.date}}</td>
+                            <td>{{this.start_time}}</td>
+                            <td>{{this.end_time}}</td>
+                            <td>{{this.project_name}}</td>
+                            <td id="desc_data">{{this.description}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </body>
-
 </html>

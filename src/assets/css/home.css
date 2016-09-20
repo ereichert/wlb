@@ -1,20 +1,64 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
 html, body {
     height: 100%;
     padding: 0;
     margin: 0;
     background-color: white;
+    font-family: 'Roboto', sans-serif;
 }
 
 #task_entry_area {
-    margin-left: 25%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
     padding-top: 25px;
-    width: 50%;
 }
 
 #task_entry_area textarea {
-    width: 100%;
+    padding: 0;
+    width:100%;
 }
 
 label {
     display: inline;
+}
+
+#task_history_table {
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    padding-top: 10px;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: lightgray;
+}
+
+tbody {
+    border-top: solid white;
+}
+
+.date_time_cols, .project_col {
+    width: 8%;
+}
+
+td {
+    border: 1px solid white;
+    text-align: center;
+    word-wrap:break-word
+}
+
+#desc_data {
+    text-align: left;
 }
