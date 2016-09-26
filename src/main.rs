@@ -3,7 +3,8 @@
 
 extern crate env_logger;
 extern crate iron;
-extern crate handlebars_iron as hbs;
+extern crate handlebars as hbs;
+extern crate handlebars_iron as hbi;
 extern crate router;
 extern crate mount;
 extern crate staticfile;
@@ -12,9 +13,10 @@ extern crate rustc_serialize;
 use iron::prelude::{Chain, Iron, Request, Response};
 use iron::{IronResult, status, Set};
 
-use hbs::{HandlebarsEngine};
+use hbs::{Handlebars, RenderError, RenderContext, Helper, Context, Renderable};
+use hbi::{HandlebarsEngine};
 #[cfg(feature = "watch")]
-use hbs::Watchable;
+use hbi::Watchable;
 
 use mount::Mount;
 use staticfile::Static;
@@ -32,12 +34,15 @@ fn main() {
     let views_ext = ".hbs";
     let views_path = "./src/views";
 
-    let mut hbse = HandlebarsEngine::new();
+    let mut hbs = Handlebars::new();
+    hbs.register_helper("if-multiple-of", Box::new(if_multiple_of_helper));
+    let mut hbse = HandlebarsEngine::from(hbs);
     // TODO: Investigate serving the templates out of the binary using include_string!
-    hbse.add(Box::new(hbs::DirectorySource::new(views_path, views_ext)));
+    hbse.add(Box::new(hbi::DirectorySource::new(views_path, views_ext)));
     if let Err(r) = hbse.reload() {
         panic!("{:?}", r.description());
     }
+
     let hbse_ref = Arc::new(hbse);
     hbse_ref.watch(views_path);
 
@@ -63,8 +68,26 @@ fn main() {
 fn home_handler(_: &mut Request) -> IronResult<Response> {
     let data = make_test_records();
     let mut resp = Response::new();
-    resp.set_mut(hbs::Template::new("home", data)).set_mut(status::Ok);
+    resp.set_mut(hbi::Template::new("home", data)).set_mut(status::Ok);
     Ok(resp)
+}
+
+const FACTOR_OF_INTEREST_IDX: usize = 0;
+const CANDIDATE_IDX: usize = 1;
+fn if_multiple_of_helper(c: &Context, h: &Helper, r: &Handlebars, rc: &mut RenderContext) -> Result<(), RenderError> {
+    let factor_of_interest = h.param(FACTOR_OF_INTEREST_IDX).unwrap().value().as_u64().unwrap();
+    let candidate = h.param(CANDIDATE_IDX).unwrap().value().as_u64().unwrap();
+
+    let possible_template = if candidate % factor_of_interest == 0 {
+        h.template()
+    } else {
+        h.inverse()
+    };
+
+    match possible_template {
+        Some(ref t) => t.render(c, r, rc),
+        None => Ok(()),
+    }
 }
 
 #[derive(ToJson)]
@@ -123,4 +146,10 @@ fn make_test_records() -> BTreeMap<String, Vec<Json>> {
         }.to_json(),
     ]);
     data
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
 }

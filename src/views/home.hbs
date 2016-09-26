@@ -29,7 +29,11 @@
                 </thead>
                 <tbody>
                     {{#each task_records}}
-                        <tr>
+                        {{#if-multiple-of 2 @index}}
+                            <tr>
+                        {{else}}
+                            <tr class="row_highlight">
+                        {{/if-multiple-of}}
                             <td>{{this.date}}</td>
                             <td>{{this.start_time}}</td>
                             <td>{{this.end_time}}</td>

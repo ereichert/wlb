@@ -62,3 +62,7 @@ td {
 #desc_data {
     text-align: left;
 }
+
+.row_highlight {
+    background-color: #c9d7e6;
+}
