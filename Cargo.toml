@@ -15,4 +15,4 @@ tojson_macros = "0.2.4"
 rustc-serialize = "0.3.19"
 
 [features]
-watch = ["handlebars-iron/watch"]
+default = ["handlebars-iron/watch"]
