@@ -4,11 +4,45 @@
     <head>
         <!--// TODO: Investigate serving the static content without having to put the full path.  You should be able to key off the file extension during routing.-->
         <script src="assets/javascript/javascript.js"></script>
+        <link rel="stylesheet" href="assets/css/home.css">
         <title>Work Life Balance</title>
     </head>
 
     <body>
-        Are you balanced?
+        <div id="task_entry_area">
+            <form action="">
+                <label for="task_entry">Add task:</label><br>
+                <textarea id="task_entry" rows="3" autofocus></textarea><br>
+                <input type="submit" value="Save">
+            </form>
+        </div>
+        <div id="task_history_table">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="date_time_cols">Date</th>
+                        <th class="date_time_cols">Start</th>
+                        <th class="date_time_cols">Stop</th>
+                        <th class="project_col">Project</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each task_records}}
+                        {{#if-multiple-of 2 @index}}
+                            <tr>
+                        {{else}}
+                            <tr class="row_highlight">
+                        {{/if-multiple-of}}
+                            <td>{{this.date}}</td>
+                            <td>{{this.start_time}}</td>
+                            <td>{{this.end_time}}</td>
+                            <td>{{this.project_name}}</td>
+                            <td id="desc_data">{{this.description}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
     </body>
-
 </html>
