@@ -42,15 +42,14 @@ fn main() {
     if let Err(r) = hbse.reload() {
         panic!("{:?}", r.description());
     }
-
-    let mut home_chain = Chain::new(home_handler);
-
     let hbse_ref = Arc::new(hbse);
     if cfg!(debug_assertions) {
         println!("WARNING: DEBUG ASSERTIONS ENABLED.  TEMPLATES ARE WATCHED.");
         use hbi::Watchable;
         hbse_ref.watch(views_path);
     }
+
+    let mut home_chain = Chain::new(home_handler);
     home_chain.link_after(hbse_ref);
 
     let mut router = router::Router::new();
