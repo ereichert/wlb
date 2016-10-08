@@ -13,6 +13,7 @@ mount = "0.2.1"
 staticfile = "0.3.0"
 tojson_macros = "0.2.4"
 rustc-serialize = "0.3.19"
+urlencoded = "0.4.1"
 
 [features]
 default = ["handlebars-iron/watch"]

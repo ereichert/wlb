@@ -8,23 +8,23 @@ extern crate handlebars_iron as hbi;
 extern crate router;
 extern crate mount;
 extern crate staticfile;
+extern crate urlencoded;
 extern crate rustc_serialize;
-
-use iron::prelude::{Chain, Iron, Request, Response};
-use iron::{IronResult, status, Set};
-
-use hbs::Handlebars;
-use hbi::{HandlebarsEngine};
-
-use mount::Mount;
-use staticfile::Static;
-
-use rustc_serialize::json::{Json, ToJson};
 
 use std::sync::Arc;
 use std::error::Error;
 use std::path::Path;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
+
+use iron::prelude::{Chain, Iron, Request, Response};
+use iron::{IronResult, status, Set};
+use iron::Plugin;
+use hbs::Handlebars;
+use hbi::{HandlebarsEngine};
+use mount::Mount;
+use staticfile::Static;
+use urlencoded::UrlEncodedBody;
+use rustc_serialize::json::{Json, ToJson};
 
 mod view_helpers;
 
@@ -54,6 +54,7 @@ fn main() {
 
     let mut router = router::Router::new();
     router.get("/", home_chain, "get_home");
+    router.post("/new_task", new_task_handler, "new_task");
 
     let mut assets_mount = Mount::new();
     assets_mount
@@ -72,6 +73,25 @@ fn home_handler(_: &mut Request) -> IronResult<Response> {
     let data = make_test_records();
     let mut resp = Response::new();
     resp.set_mut(hbi::Template::new("home", data)).set_mut(status::Ok);
+    Ok(resp)
+}
+
+fn new_task_handler(req: &mut Request) -> IronResult<Response> {
+    println!("Reached the new task handler");
+    println!("req = {:?}", req);
+    let empty_hm = HashMap::new();
+    let hm = match req.get_ref::<UrlEncodedBody>() {
+        Ok(hashmap) => hashmap,
+        Err(ref e) => {
+            println!("{:?}", e);
+            &empty_hm
+        }
+    };
+
+
+    println!("encoded data = {:?}", hm);
+    let mut resp = Response::new();
+    resp.set_mut(hbi::Template::new("home", make_test_records())).set_mut(status::Ok);
     Ok(resp)
 }
 
