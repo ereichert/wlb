@@ -15,5 +15,8 @@ tojson_macros = "0.2.4"
 rustc-serialize = "0.3.19"
 urlencoded = "0.4.1"
 
+[dev-dependencies]
+iron-test = "0.4.0"
+
 [features]
 default = ["handlebars-iron/watch"]
