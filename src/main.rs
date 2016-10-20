@@ -8,25 +8,21 @@ extern crate handlebars_iron as hbi;
 extern crate router;
 extern crate mount;
 extern crate staticfile;
-extern crate urlencoded;
 extern crate rustc_serialize;
+extern crate urlencoded;
 
 use std::sync::Arc;
 use std::error::Error;
 use std::path::Path;
-use std::collections::HashMap;
 
-use iron::prelude::{Chain, Iron, Request, Response};
-use iron::{IronResult, status, Set};
-use iron::Plugin;
+use iron::prelude::{Chain, Iron};
 use hbs::Handlebars;
 use hbi::{HandlebarsEngine};
 use mount::Mount;
 use staticfile::Static;
-use urlencoded::UrlEncodedBody;
 
 mod view_helpers;
-mod routing;
+mod chain;
 mod handlers;
 
 fn main() {
@@ -50,41 +46,17 @@ fn main() {
         hbse_ref.watch(views_path);
     }
 
-    let mut home_chain = Chain::new(handlers::home_handler);
-    home_chain.link_after(hbse_ref);
-
-    let mut router = router::Router::new();
-    router.get("/", home_chain, "get_home");
-    router.post("/new_task", new_task_handler, "new_task");
-
+    let mut router = chain::chain();
     let mut assets_mount = Mount::new();
-    assets_mount
-        .mount("/", router)
-        .mount("/assets/", Static::new(Path::new("src/assets")));
+    assets_mount.mount("/assets/", Static::new(Path::new("src/assets")));
+    router.get("/assets/*", assets_mount, "assets");
+    let mut home_chain = Chain::new(router);
+    home_chain.link_after(hbse_ref);
 
     let port = 3000;
     let bind_addr = format!("localhost:{}", port);
-    let _server_guard = Iron::new(assets_mount).http(bind_addr.as_str()).unwrap();
+    let _server_guard = Iron::new(home_chain).http(bind_addr.as_str()).unwrap();
 
     let version = include_str!("version.txt");
     println!("Running WLB v{} on port {}.", version, port)
-}
-
-fn new_task_handler(req: &mut Request) -> IronResult<Response> {
-    println!("Reached the new task handler");
-    println!("req = {:?}", req);
-    let empty_hm = HashMap::new();
-    let hm = match req.get_ref::<UrlEncodedBody>() {
-        Ok(hashmap) => hashmap,
-        Err(ref e) => {
-            println!("{:?}", e);
-            &empty_hm
-        }
-    };
-
-
-    println!("encoded data = {:?}", hm);
-    let mut resp = Response::new();
-    resp.set_mut(hbi::Template::new("home", handlers::make_test_records())).set_mut(status::Ok);
-    Ok(resp)
 }

@@ -1,8 +1,28 @@
+use std::collections::{BTreeMap, HashMap};
+
 use iron::prelude::{Request, Response};
 use iron::{IronResult, Set, status};
 use rustc_serialize::json::{Json, ToJson};
-use std::collections::BTreeMap;
 use hbi;
+use urlencoded::UrlEncodedBody;
+use iron::Plugin;
+
+pub fn new_task_handler(req: &mut Request) -> IronResult<Response> {
+    println!("Reached the new task handler");
+    println!("req = {:?}", req);
+    let empty_hm = HashMap::new();
+    let hm = match req.get_ref::<UrlEncodedBody>() {
+        Ok(hashmap) => hashmap,
+        Err(ref e) => {
+            println!("{:?}", e);
+            &empty_hm
+        }
+    };
+    println!("encoded data = {:?}", hm);
+    let mut resp = Response::new();
+    resp.set_mut(hbi::Template::new("home", make_test_records())).set_mut(status::Ok);
+    Ok(resp)
+}
 
 pub fn home_handler(_: &mut Request) -> IronResult<Response> {
     let data = make_test_records();
