@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
+use std::path::Path;
 
 use iron::prelude::{Request, Response};
 use iron::{IronResult, Set, status};
@@ -6,6 +7,9 @@ use rustc_serialize::json::{Json, ToJson};
 use hbi;
 use urlencoded::UrlEncodedBody;
 use iron::Plugin;
+
+use mount;
+use staticfile::Static;
 
 pub fn new_task_handler(req: &mut Request) -> IronResult<Response> {
     println!("Reached the new task handler");
@@ -29,6 +33,17 @@ pub fn home_handler(_: &mut Request) -> IronResult<Response> {
     let mut resp = Response::new();
     resp.set_mut(hbi::Template::new("home", data)).set_mut(status::Ok);
     Ok(resp)
+}
+
+pub struct AssetsHandler;
+
+impl AssetsHandler {
+
+    pub fn new(prefix: &str, mount_path: &str) -> mount::Mount {
+        let mut assets_mount = mount::Mount::new();
+        assets_mount.mount(prefix, Static::new(Path::new(mount_path)));
+        assets_mount
+    }
 }
 
 #[derive(ToJson)]

@@ -13,13 +13,10 @@ extern crate urlencoded;
 
 use std::sync::Arc;
 use std::error::Error;
-use std::path::Path;
 
-use iron::prelude::{Chain, Iron};
+use iron::prelude::Iron;
 use hbs::Handlebars;
 use hbi::{HandlebarsEngine};
-use mount::Mount;
-use staticfile::Static;
 
 mod view_helpers;
 mod chain;
@@ -46,16 +43,12 @@ fn main() {
         hbse_ref.watch(views_path);
     }
 
-    let mut router = chain::chain();
-    let mut assets_mount = Mount::new();
-    assets_mount.mount("/assets/", Static::new(Path::new("src/assets")));
-    router.get("/assets/*", assets_mount, "assets");
-    let mut home_chain = Chain::new(router);
-    home_chain.link_after(hbse_ref);
+    let mut chain = chain::chain();
+    chain.link_after(hbse_ref);
 
     let port = 3000;
     let bind_addr = format!("localhost:{}", port);
-    let _server_guard = Iron::new(home_chain).http(bind_addr.as_str()).unwrap();
+    let _server_guard = Iron::new(chain).http(bind_addr.as_str()).unwrap();
 
     let version = include_str!("version.txt");
     println!("Running WLB v{} on port {}.", version, port)
