@@ -1,5 +1,5 @@
 #![feature(custom_derive, plugin)]
-#![plugin(tojson_macros)]
+#![feature(proc_macro)]
 
 extern crate env_logger;
 extern crate iron;
@@ -10,6 +10,8 @@ extern crate mount;
 extern crate staticfile;
 extern crate rustc_serialize;
 extern crate urlencoded;
+#[macro_use]
+extern crate tojson_macros;
 
 use std::sync::Arc;
 use std::error::Error;
